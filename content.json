@@ -1,0 +1,397 @@
+{
+  "hero": {
+    "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1920&q=80",
+    "title": "Crafting Excellence",
+    "titleAccent": "in Every Piece",
+    "description": "Your trusted jewelry manufacturing partner. We provide premium OEM/ODM services for Jewelry retailers around the world, delivering quality jewelry at factory-direct pricing.",
+    "btn1Text": "View Collections",
+    "btn1Link": "#collections",
+    "btn2Text": "Request Quote",
+    "btn2Link": "#contact",
+    "stat1Num": "10+",
+    "stat1Label": "YEARS EXPERIENCE",
+    "stat2Num": "50kg+ of gold",
+    "stat2Label": "MONTHLY CAPACITY",
+    "stat3Num": "100+",
+    "stat3Label": "GLOBAL CLIENTS"
+  },
+  "collections": {
+    "label": "Our Collections",
+    "title": "Explore Our Jewelry",
+    "subtitle": "From classic to contemporary, discover jewelry crafted with precision and passion.",
+    "items": [
+      {
+        "name": "Rings",
+        "desc": "Rings made of 9K to 22K gold, set with natural diamonds, lab-grown diamonds, colored gemstones, and more",
+        "image": "images/img_114oddpeiqy.jpg",
+        "products": [
+          {
+            "name": "LOVE ring, classic model, paved, 6 diamonds",
+            "desc": "Product description:\n• 18K white gold\n• Set with 72 brilliant-cut diamonds totaling 1.23 carats (for size 52)\n• Width: 5.5 mm",
+            "images": [
+              "images/img_rfy867npb8.jpg",
+              "images/img_1xoj6z147d2.jpg",
+              "images/img_9hvxbam4ry.jpg",
+              "images/img_1opaohbe6xt.jpg"
+            ]
+          },
+          {
+            "name": "Juste un Clou ring, small model, diamonds",
+            "desc": "Product description:\n• 18K white gold (750/1000)\n• Set with brilliant-cut diamonds totaling 0.08 carat\n• Width: 1.8mm",
+            "images": [
+              "images/img_942kpztt6t.jpg",
+              "images/img_1nkfgoycxgc.jpg",
+              "images/img_1c754tjykt4.jpg",
+              "images/img_1bzl6pwcr38.jpg"
+            ]
+          },
+          {
+            "name": "Serpenti Viper Ring",
+            "desc": "Serpenti Viper one-coil 18 kt white gold ring set with full pavé diamonds",
+            "images": [
+              "images/img_mfeanwur6w.jpg",
+              "images/img_11e6nhbyzd0.jpg",
+              "images/img_20yft8co1q4.jpg",
+              "images/img_2a9jaw3079u.jpg"
+            ]
+          },
+          {
+            "name": "18K Gold Aquamarine and Natural Diamond Ring",
+            "desc": "Weight: 3 g; Aquamarine: 0.3 carats; Diamond: 0.6 carats",
+            "images": [
+              "images/img_jwrr9sgs1g.jpg",
+              "images/img_1w1tyhi76f5.jpg",
+              "images/img_1ofuajnc94i.jpg",
+              "images/img_1xer70zqy6j.jpg"
+            ]
+          },
+          {
+            "name": "18K white gold ring set with natural diamonds and black ceramic",
+            "desc": "set with natural diamonds and black ceramic",
+            "images": [
+              "images/img_1owdivsgd3o.jpg",
+              "images/img_2c6oe4y4p1r.jpg",
+              "images/img_2086n6mhp2s.jpg",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Necklaces",
+        "desc": "Necklaces made of 9K to 22K gold, set with natural diamonds, lab-grown diamonds, colored gemstones, and more",
+        "image": "images/img_10gpc3xda21.jpg",
+        "products": [
+          {
+            "name": "Serpenti Viper Bracelet",
+            "desc": " One-coil 18 kt white gold bracelet set with pavé diamonds on the head and tail.",
+            "images": [
+              "images/img_oictfu2jim.jpg",
+              "images/img_1lqcg1oodhb.jpg",
+              "images/img_htov4hogmb.jpg",
+              "images/img_28hf5u8v8mj.jpg"
+            ],
+            "video": ""
+          },
+          {
+            "name": "Serpenti Viper Necklace",
+            "desc": "Serpenti Viper 18 kt rose gold pendant necklace set with full pavé diamonds",
+            "images": [
+              "images/img_rx2h13qart.jpg",
+              "images/img_p461e2d0x3.jpg",
+              "images/img_1bvbtvgdq6e.jpg",
+              "images/img_gydjtkt0bg.jpg"
+            ]
+          },
+          {
+            "name": "Necklace, small model",
+            "desc": "Product description:\n• 18K yellow gold (750/1000)\n• Width: 3mm\n• Necklace length: 37cm",
+            "images": [
+              "images/img_ddlbemczsu.jpg",
+              "images/img_zudgbz724d.jpg",
+              "images/img_1zoa4hjy05t.jpg",
+              ""
+            ]
+          },
+          {
+            "name": "18K rose gold knot necklace",
+            "desc": " set with natural diamonds",
+            "images": [
+              "images/img_bgkcqedji2.jpg",
+              "images/img_1cs07tklwdd.jpg",
+              "images/img_1ot73tjhcbz.jpg",
+              "images/img_ntsu4uf08z.jpg"
+            ]
+          },
+          {
+            "name": "Loop Necklace",
+            "desc": "Platinum Necklace. PT950 Natural Diamond",
+            "images": [
+              "images/img_12hyfrm33ud.jpg",
+              "images/img_1d26z8y1g1q.jpg",
+              "images/img_wocba72g9q.jpg",
+              "images/img_zjbxg2ik6e.jpg"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Earrings",
+        "desc": "Earrings made of 9K to 22K gold, set with natural diamonds, lab-grown diamonds, colored gemstones, and more",
+        "image": "images/img_znfbfmyxj4.jpg",
+        "products": [
+          {
+            "name": "Serpenti Viper Earrings",
+            "desc": "Serpenti Viper 18 kt white gold hoop earrings set with full pavé diamonds",
+            "images": [
+              "images/img_13wkngwwt7d.jpg",
+              "images/img_gmky79lghd.jpg",
+              "images/img_gvazhuuwen.jpg",
+              "images/img_27dan3p1odz.jpg"
+            ],
+            "video": ""
+          }
+        ]
+      },
+      {
+        "name": "Bracelets",
+        "desc": "Tennis bracelets, bangles, made of 9K to 22K gold, set with natural diamonds, lab-grown diamonds, colored gemstones, and more",
+        "image": "images/img_1pd3q8zv62f.jpg",
+        "products": [
+          {
+            "name": "Serpenti Viper one-coil 18 kt white gold bracelet",
+            "desc": "Serpenti Viper one-coil 18 kt white gold bracelet set with pavé diamonds on the head and tail.",
+            "images": [
+              "images/img_1p7pwsu424t.jpg",
+              "images/img_ygb82qu2up.jpg",
+              "images/img_6j8o6i6jyq.jpg",
+              "images/img_17hhupex5ph.jpg"
+            ],
+            "video": ""
+          },
+          {
+            "name": "18K Rose Gold Bracelet with 4 Diamonds",
+            "desc": "Medium model, 4 diamonds.Product description:\n• 18K rose gold (750/1000)\n• Set with 4 brilliant-cut diamonds totaling 0.19 carats\n• Width: 4.8 mm\n• Fastening system: functional screw and hinge\n• Comes with a screwdriver",
+            "images": [
+              "images/img_1pmkjlho8gw.jpg",
+              "images/img_84knsn1wpw.jpg",
+              "images/img_1b14umzee4w.jpg",
+              "images/img_1f22ij1l80p.jpg"
+            ],
+            "video": ""
+          },
+          {
+            "name": "LOVE bracelet, medium model, paved",
+            "desc": "Product description:\n• 18K yellow gold (750/1000)\n• Set with 237 brilliant-cut diamonds totaling 1.67 carats (for size 17)\n• Width: 4.8 mm\n• Closing system: functional screw and hinge\n• Comes with a screwdriver",
+            "images": [
+              "images/img_ia36naigne.jpg",
+              "images/img_2f7sczhflvl.jpg",
+              "images/img_1l4l9ucq2j3.jpg",
+              "images/img_e7sa0io6sv.jpg"
+            ]
+          },
+          {
+            "name": "bracelet, 5 motifs",
+            "desc": "18K white gold, Mother-of-pearl",
+            "images": [
+              "images/img_1ketitmpkg7.jpg",
+              "images/img_21cqgbdvv5r.jpg",
+              "images/img_1zvwlee170s.jpg",
+              "images/img_4jt3xhp00t.jpg"
+            ]
+          },
+          {
+            "name": "Juste un Clou bracelet, classic model, diamonds",
+            "desc": "Product description:\n• 18K white gold (750/1000)\n• Set with 32 brilliant-cut diamonds totaling 0.58 carat\n• Width: 3.5mm",
+            "images": [
+              "images/img_nd2jqiuvi1.jpg",
+              "images/img_ahtrn1j683.jpg",
+              "images/img_17d8uvjqgwx.jpg",
+              "images/img_1p98yz07h9s.jpg"
+            ]
+          },
+          {
+            "name": "LOVE bracelet, classic model, paved",
+            "desc": "Product description:\n• 18K white gold (750/1000)\n• Set with 165 brilliant-cut diamonds totaling 3.07 carats (for size 17)\n• Width: 6.1 mm\n• Fastening system: functional screw and hinge",
+            "images": [
+              "images/img_1dkzywklp5a.jpg",
+              "images/img_1rewx0qda6v.jpg",
+              "images/img_2ndlpalwfs.jpg",
+              "images/img_729x2iivn1.jpg"
+            ]
+          },
+          {
+            "name": "LOVE bracelet, classic model, paved, ceramic",
+            "desc": "Product description:\n• White gold 750/1000\n• Black ceramic\n• Set with 165 brilliant-cut diamonds totalling 3.07 carats (for size 17)\n• Width: 6.1 mm\n• Fastening system: functional screw and hinge",
+            "images": [
+              "images/img_2acien7ji6w.jpg",
+              "images/img_1855je6s3ng.jpg",
+              "images/img_gqwtsthydi.jpg",
+              "images/img_15hacemgbkz.jpg"
+            ]
+          },
+          {
+            "name": "Chance Infinie bracelet",
+            "desc": "18k yellow gold and diamonds large model,Buckle length: 26 mm,\nBuckle width: 8 mm",
+            "images": [
+              "images/img_14ctafcqjyp.jpg",
+              "images/img_1m7tbfvxuom.jpg",
+              "images/img_1k2xeuqfb2y.jpg",
+              "images/img_1e3scbrwf6n.jpg"
+            ]
+          },
+          {
+            "name": "Panthère de bracelet, medium model, half-paved",
+            "desc": "Product description:\n• 18K white gold (750/1000)\n• 2 emeralds\n• Onyx\n• Set with 225 brilliant-cut diamonds totaling 2.55 carats (for size 17)\n• Maximum width: 12.7 mm",
+            "images": [
+              "images/img_10jv3rfqul4.jpg",
+              "images/img_jjbrg82p1v.jpg",
+              "images/img_1vghzholhft.jpg",
+              "images/img_14p61mfappm.jpg"
+            ]
+          },
+          {
+            "name": "Panthère de ring, paved",
+            "desc": "Product description:\n• 18K white gold (750/1000)\n• 2 emeralds\n• Onyx\n• Set with 225 brilliant-cut diamonds totaling 2.55 carats (for size 17)\n• Maximum width: 12.7 mm",
+            "images": [
+              "images/img_2cfovrb8ydb.jpg",
+              "images/img_t8jnxxi3m4.jpg",
+              "images/img_cla7fj1k74.jpg",
+              "images/img_pl4zof61jr.jpg"
+            ]
+          },
+          {
+            "name": "18K white gold bracelet",
+            "desc": "Set with natural diamonds",
+            "images": [
+              "images/img_lund0bc4ih.jpg",
+              "images/img_2d8ar6xp912.jpg",
+              "images/img_1cmu37gy0b0.jpg",
+              "images/img_1m92z58myvy.jpg"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "about": {
+    "title": "Where Craftsmanship Meets Reliability",
+    "p1": "For over a decade, WELLSHINEGOLD has been a trusted jewelry manufacturing partner for retailers Jewelry retailers around the world. Our factory combines traditional craftsmanship with modern production technology.",
+    "p2": "From design concept to final packaging, we handle every step in-house, ensuring consistent quality, competitive pricing, and reliable delivery for your brand.",
+    "p3": "Every piece undergoes 100% quality inspection before shipping. Our team works closely with you to bring your designs to life, or help you create something new from scratch.",
+    "image": "images/img_13sbvvvt2pr.jpg"
+  },
+  "stats": [
+    {
+      "num": "10+",
+      "label": "Years of Experience"
+    },
+    {
+      "num": "50kg+ of gold",
+      "label": "Pieces per Month"
+    },
+    {
+      "num": "100+",
+      "label": "Satisfied Clients"
+    },
+    {
+      "num": "100%",
+      "label": "Quality Inspected"
+    }
+  ],
+  "services": {
+    "label": "Our Services",
+    "title": "End-to-End Manufacturing",
+    "subtitle": "Comprehensive jewelry manufacturing services tailored to your brand's needs.",
+    "items": [
+      {
+        "title": "OEM Manufacturing",
+        "desc": "Send us your designs or samples. We produce to your exact specifications with precision tooling."
+      },
+      {
+        "title": "ODM Design",
+        "desc": "Our design team creates original pieces based on your brand identity and target market preferences."
+      },
+      {
+        "title": "Packaging Services",
+        "desc": "We specialize in jewelry production. If you need professional packaging, we can help you buy or order any packaging.We make no profit from packaging — you only pay the packaging cost and shipping fees.When you order jewelry from us, this service is free."
+      },
+      {
+        "title": "Quality Certification",
+        "desc": "Every piece of jewelry goes through multiple quality checks to ensure you receive perfect quality."
+      }
+    ]
+  },
+  "features": {
+    "label": "Why Choose Us",
+    "title": "The WELLSHINEGOLD Advantage",
+    "subtitle": "Four reasons why Jewelry retailers around the world choose us as their manufacturing partner.",
+    "items": [
+      {
+        "num": "01",
+        "title": "Factory Direct Pricing",
+        "desc": "No middleman markup. You work directly with the manufacturer, getting the best possible price for your order volume."
+      },
+      {
+        "num": "02",
+        "title": "Fast Turnaround",
+        "desc": "10-20 days for bulk orders, 5-9 days for small orders. We understand retail seasonality and meet your deadlines."
+      },
+      {
+        "num": "03",
+        "title": "Strict Quality Control",
+        "desc": "Every single piece is inspected before packaging. We maintain a less than 0.5% defect rate across all product lines."
+      },
+      {
+        "num": "04",
+        "title": "Flexible MOQ",
+        "desc": "No minimum order quantity — you can start with just 1 sample piece.Perfect for testing new designs or for small retail chains placing their first order.Even for 1 sample piece, we offer wholesale pricing.Of course, if you order in bulk, we can lower production costs and give you bigger discounts."
+      }
+    ]
+  },
+  "testimonials": {
+    "label": "Client Reviews",
+    "title": "What Our Clients Say",
+    "subtitle": "Trusted by Jewelry retailers around the world. Here's what they have to say about working with us.",
+    "items": [
+      {
+        "quote": "We've been working with WELLSHINEGOLD for over 3 years now. Their attention to detail and consistent quality across every order is remarkable. The turnaround time is exactly as promised, never a delay. They've become our go-to manufacturing partner.",
+        "name": "Sarah Mitchell",
+        "meta": "Owner, custom jewelry store, Miami",
+        "avatar": "SM"
+      },
+      {
+        "quote": "As a boutique chain with 3 stores, we needed a supplier who could handle small MOQs without compromising on craftsmanship. WELLSHINEGOLD delivered beyond expectations. The ODM design service helped us launch two best-selling collections last season.",
+        "name": "James Carter",
+        "meta": "Owner, Fine Jewelry, Toronto",
+        "avatar": "JC"
+      },
+      {
+        "quote": "What sets them apart is the communication. Every question gets answered within hours, samples arrive on schedule, and the quality inspection reports give us full confidence. After trying 4 other factories in China, this is the only one that meets our standards.",
+        "name": "Megan Rodriguez",
+        "meta": "Sourcing Manager, Luxury watch and jewelry store, California",
+        "avatar": "MR"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Let's Work Together",
+    "subtitle": "Tell us about your project. We'll get back to you within 24 hours with pricing and next steps.",
+    "email": "wellshinegold8888@gmail.com",
+    "formEmail": "wellshinegold8888@gmail.com",
+    "emailjsServiceId": "service_tu1sfts",
+    "emailjsTemplateId": "template_pxqhqcf",
+    "emailjsPublicKey": "r7VfTH1T5Y0fLBN2Q",
+    "whatsappDisplay": "+86 15815774763",
+    "whatsappLink": "https://wa.me/8615815774763",
+    "address": "Jewelry Industrial Park, Shenzhen, China",
+    "responseTime": "Within 24 Hours"
+  },
+  "footer": {
+    "description": "Professional jewelry manufacturer providing OEM/ODM services to retailers worldwide. Quality you can trust, prices you can afford.",
+    "copyright": "© 2026 WELLSHINEGOLD Jewelry. All rights reserved.",
+    "socialInstagram": "https://www.instagram.com/jackliang88688/",
+    "socialFacebook": "https://www.facebook.com/jack.liang.258315",
+    "socialWhatsApp": "https://wa.me/8615815774763"
+  }
+}
