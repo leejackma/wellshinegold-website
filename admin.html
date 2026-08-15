@@ -1000,24 +1000,23 @@ async function saveContent() {
   markSaved();
   sendToPreview();
 
-  // Cloud sync: if GitHub is configured, push images and a slim content.json.
-  // Netlify (connected to the repo) will auto-deploy in 1-2 minutes.
+  // Cloud sync: if GitHub is configured, push images and a slim content.json
+  // in ONE single commit (far more reliable than one commit per image).
   var cfg = getGithubConfig();
   if (cfg.token && cfg.owner && cfg.repo) {
     showToast('正在同步到云端... / Syncing to cloud...', 'info');
     try {
       var prepared = prepareCloudContent(content);
-      // Upload each image as a separate binary file first
-      if (prepared.images.length > 0) {
-        showToast('正在上传 ' + prepared.images.length + ' 张原图到云端... / Uploading images...', 'info');
-        for (var i = 0; i < prepared.images.length; i++) {
-          var img = prepared.images[i];
-          await githubCommitFile(cfg, img.path, {base64: img.base64}, 'Upload image ' + img.filename);
-        }
+      var files = [];
+      for (var i = 0; i < prepared.images.length; i++) {
+        files.push({path: prepared.images[i].path, base64: prepared.images[i].base64});
       }
-      // Then upload the slim content.json (only image paths, no base64)
-      await githubCommitFile(cfg, cfg.path || 'content.json', prepared.json, 'Update site content via admin panel');
-      showToast('保存成功！云端已同步，1-2 分钟后全网更新 / Saved & synced! Live in 1-2 min', 'success');
+      files.push({path: cfg.path || 'content.json', text: prepared.json});
+      var total = files.length;
+      await githubCommitFiles(cfg, files, 'Update site content via admin panel', function(done) {
+        showToast('正在上传 ' + done + '/' + total + ' ... / Uploading ' + done + '/' + total, 'info');
+      });
+      showToast('保存成功！云端已同步，几分钟后全网更新 / Saved & synced! Live in a few minutes', 'success');
     } catch(e) {
       console.error('Cloud sync failed:', e);
       showToast('本地已保存，云端同步失败：' + (e.message || e) + ' / Local saved, cloud sync failed', 'error');
@@ -1195,6 +1194,73 @@ async function githubCommitFile(cfg, path, content, message) {
   return newCommit.sha;
 }
 
+// Commit multiple files in ONE single commit — much faster and far more
+// reliable than one commit per file. files: [{path, text} | {path, base64}]
+async function githubCommitFiles(cfg, files, message, onProgress) {
+  var owner = cfg.owner, repo = cfg.repo, branch = cfg.branch || 'main', token = cfg.token;
+  var headers = {
+    'Authorization': 'token ' + token,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json'
+  };
+  var api = 'https://api.github.com/repos/' + owner + '/' + repo;
+
+  // 1. Get current branch ref (commit SHA)
+  var refRes = await fetch(api + '/git/refs/heads/' + branch, {headers: headers});
+  if (!refRes.ok) {
+    if (refRes.status === 401) throw new Error('Token 无效 / Token invalid');
+    if (refRes.status === 404) throw new Error('分支 ' + branch + ' 不存在 / Branch not found');
+    throw new Error('读取分支失败 HTTP ' + refRes.status);
+  }
+  var commitSha = (await refRes.json()).object.sha;
+
+  // 2. Get current commit's tree SHA
+  var commitRes = await fetch(api + '/git/commits/' + commitSha, {headers: headers});
+  if (!commitRes.ok) throw new Error('读取 commit 失败');
+  var treeSha = (await commitRes.json()).tree.sha;
+
+  // 3. Create one blob per file, collect tree entries
+  var entries = [];
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    var b64 = f.base64;
+    if (typeof f.text === 'string') {
+      b64 = btoa(unescape(encodeURIComponent(f.text)));
+    }
+    var blobRes = await fetch(api + '/git/blobs', {
+      method: 'POST', headers: headers,
+      body: JSON.stringify({content: b64, encoding: 'base64'})
+    });
+    if (!blobRes.ok) throw new Error('上传 ' + f.path + ' 失败 HTTP ' + blobRes.status);
+    entries.push({path: f.path, mode: '100644', type: 'blob', sha: (await blobRes.json()).sha});
+    if (onProgress) onProgress(i + 1);
+  }
+
+  // 4. Create one tree containing all files
+  var treeRes = await fetch(api + '/git/trees', {
+    method: 'POST', headers: headers,
+    body: JSON.stringify({base_tree: treeSha, tree: entries})
+  });
+  if (!treeRes.ok) throw new Error('创建 tree 失败 HTTP ' + treeRes.status);
+  var tree = await treeRes.json();
+
+  // 5. Create one commit
+  var newCommitRes = await fetch(api + '/git/commits', {
+    method: 'POST', headers: headers,
+    body: JSON.stringify({message: message, tree: tree.sha, parents: [commitSha]})
+  });
+  if (!newCommitRes.ok) throw new Error('创建 commit 失败 HTTP ' + newCommitRes.status);
+  var newCommit = await newCommitRes.json();
+
+  // 6. Update branch ref — everything goes live atomically
+  var updateRefRes = await fetch(api + '/git/refs/heads/' + branch, {
+    method: 'PATCH', headers: headers,
+    body: JSON.stringify({sha: newCommit.sha})
+  });
+  if (!updateRefRes.ok) throw new Error('更新分支失败 HTTP ' + updateRefRes.status);
+  return newCommit.sha;
+}
+
 // ===== IndexedDB helpers for image storage =====
 var DB_NAME = 'wellsbinegold_admin';
 var DB_STORE = 'images';
@@ -1266,11 +1332,25 @@ function buildDeployableJSON() {
 // Prepare content for cloud sync: extract every base64 image into a separate
 // binary file under images/, and replace it inside content.json with its
 // relative path. This keeps content.json tiny and avoids GitHub's 25MB limit.
+// Stable hash so the same image always gets the same filename — repeated
+// saves reuse the existing file instead of adding duplicates to the repo.
+function hashString(s) {
+  var h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
 function prepareCloudContent(source) {
   var images = [];
   function walk(o) {
     if (typeof o === 'string' && o.indexOf('data:image/') === 0) {
-      var guid = 'img_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+      var guid = 'img_' + hashString(o);
       var ext = 'png';
       var semi = o.indexOf(';');
       if (semi > 0) {
