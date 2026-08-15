@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WELLSHINEGOLD - 后台管理 / Admin Panel</title>
+<link rel="icon" href="logo.png">
+<style>
+:root {
+  --primary: #1a1a2e;
+  --primary-light: #16213e;
+  --accent: #c9a96e;
+  --accent-light: #e8dcc8;
+  --bg: #f5f4f1;
+  --white: #ffffff;
+  --text: #2c2c2c;
+  --text-muted: #6b6b6b;
+  --border: #e0ddd6;
+  --success: #28a745;
+  --danger: #dc3545;
+  --sidebar-w: 210px;
+  --preview-w: 42%;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+
+/* ===== Top Bar ===== */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 56px; z-index: 100;
+  background: var(--primary); display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.topbar-brand { display: flex; align-items: center; gap: 10px; }
+.topbar-brand img { height: 34px; }
+.topbar-title { color: var(--white); font-size: 14px; font-weight: 500; letter-spacing: 0.5px; }
+.topbar-title .en { color: rgba(255,255,255,0.4); font-size: 12px; margin-left: 6px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.btn {
+  padding: 7px 16px; border: none; border-radius: 5px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
+  font-family: inherit; white-space: nowrap;
+}
+.btn svg { width: 15px; height: 15px; }
+.btn-save { background: var(--accent); color: var(--primary); }
+.btn-save:hover { background: var(--accent-light); }
+.btn-secondary { background: rgba(255,255,255,0.08); color: var(--white); border: 1px solid rgba(255,255,255,0.15); }
+.btn-secondary:hover { background: rgba(255,255,255,0.12); }
+.btn-danger { background: transparent; color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); }
+.btn-danger:hover { color: rgba(255,120,120,0.9); border-color: rgba(255,120,120,0.3); }
+.save-status { color: rgba(255,255,255,0.4); font-size: 12px; margin-right: 8px; }
+.save-status.dirty { color: var(--accent); }
+.save-status.saved { color: #4ade80; }
+
+/* ===== Layout ===== */
+.admin-body {
+  display: flex; margin-top: 56px; height: calc(100vh - 56px);
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border);
+  overflow-y: auto; flex-shrink: 0; padding: 12px 0;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px; padding: 11px 18px; cursor: pointer;
+  font-size: 13px; color: var(--text-muted); transition: all 0.15s; border-left: 3px solid transparent;
+}
+.sidebar-item:hover { background: var(--bg); color: var(--text); }
+.sidebar-item.active { background: var(--accent-light); color: var(--primary); border-left-color: var(--accent); font-weight: 500; }
+.sidebar-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+.sidebar-item .label-zh { font-weight: 500; }
+.sidebar-item .label-en { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+.sidebar-item.active .label-en { color: var(--accent); }
+
+/* Form area */
+.form-area {
+  flex: 1; overflow-y: auto; padding: 24px 28px; min-width: 0;
+}
+.panel { display: none; }
+.panel.active { display: block; }
+.panel-header { margin-bottom: 24px; }
+.panel-title { font-size: 20px; font-weight: 600; color: var(--primary); }
+.panel-title .en { font-size: 14px; color: var(--text-muted); font-weight: 400; margin-left: 8px; }
+.panel-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* Form sections */
+.form-section { background: var(--white); border-radius: 8px; padding: 22px 24px; margin-bottom: 16px; border: 1px solid var(--border); }
+.form-section-title {
+  font-size: 14px; font-weight: 600; color: var(--primary); margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.form-section-title .en { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px; }
+.form-row-full { grid-template-columns: 1fr; }
+.form-group { margin-bottom: 12px; }
+.form-group label {
+  display: flex; align-items: baseline; gap: 6px; font-size: 12px; font-weight: 500;
+  color: var(--primary); margin-bottom: 5px;
+}
+.form-group label .zh { font-weight: 600; }
+.form-group label .en { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+.form-group input, .form-group textarea {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 5px;
+  font-size: 13px; font-family: inherit; color: var(--text); background: var(--bg);
+  transition: border-color 0.2s, background 0.2s;
+}
+.form-group input:focus, .form-group textarea:focus {
+  outline: none; border-color: var(--accent); background: var(--white);
+  box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+}
+.form-group textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+.form-group .hint { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+/* Image upload component */
+.img-upload-component { display: flex; flex-direction: column; gap: 8px; }
+.img-upload-zone {
+  width: 100%; height: 130px; border: 2px dashed var(--border); border-radius: 6px;
+  background: var(--bg); cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  position: relative; overflow: hidden;
+}
+.img-upload-zone:hover { border-color: var(--accent); }
+.img-upload-zone.drag-over { border-color: var(--accent); background: rgba(201,169,110,0.1); transform: scale(1.01); }
+.img-upload-zone.uploading { border-color: var(--accent); }
+.img-upload-zone.uploading::after {
+  content: '上传中... Uploading...'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.8); font-size: 12px; color: var(--accent); font-weight: 500;
+}
+.img-upload-zone.has-image .img-upload-placeholder { display: none; }
+.img-upload-zone:not(.has-image) .img-upload-placeholder { display: flex; }
+.img-upload-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px; pointer-events: none;
+  color: var(--text-muted); font-size: 12px;
+}
+.img-upload-placeholder svg { width: 28px; height: 28px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; }
+.img-upload-zone .img-preview {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  background-size: contain; background-position: center; background-repeat: no-repeat;
+}
+.img-input { font-size: 12px !important; }
+.img-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+/* Image size hint badge */
+.img-size-hint {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--accent); background: rgba(201,169,110,0.1);
+  padding: 3px 9px; border-radius: 4px; margin-top: 4px; font-weight: 500;
+  border: 1px solid rgba(201,169,110,0.2);
+}
+.img-size-hint svg { width: 13px; height: 13px; stroke: var(--accent); fill: none; stroke-width: 2; }
+.img-size-hint .hint-zh { color: var(--text-muted); font-weight: 400; }
+.img-size-hint .hint-sep { color: var(--border); margin: 0 2px; }
+
+/* Array items */
+.array-item { background: var(--bg); border-radius: 6px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
+.array-item-header { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.array-item-header .badge { background: var(--accent); color: var(--white); padding: 2px 10px; border-radius: 10px; font-size: 11px; }
+
+/* Product sub-items (within collection categories) */
+.products-sub-section { margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 14px; }
+.products-sub-title {
+  font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.btn-add-product {
+  background: var(--accent); color: var(--primary); border: none; padding: 5px 12px;
+  border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; transition: background 0.2s;
+  font-family: inherit;
+}
+.btn-add-product:hover { background: var(--accent-light); }
+.product-sub-item {
+  background: var(--white); border-radius: 6px; padding: 14px; margin-bottom: 10px;
+  border: 1px solid var(--border); position: relative;
+}
+.product-sub-header {
+  font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px;
+  display: flex; justify-content: space-between; align-items: center;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.btn-remove-product {
+  background: transparent; border: 1px solid rgba(220,53,69,0.3); color: rgba(220,53,69,0.7);
+  width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-size: 16px;
+  line-height: 1; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+}
+.btn-remove-product:hover { background: rgba(220,53,69,0.1); color: var(--danger); border-color: var(--danger); }
+.product-img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.product-img-grid .img-upload-zone { height: 80px; }
+.product-img-grid .img-upload-placeholder span { font-size: 10px; }
+.product-img-grid .img-upload-placeholder svg { width: 20px; height: 20px; }
+.product-img-grid .img-input { font-size: 10px !important; padding: 5px 8px !important; }
+.product-img-grid .form-group { margin-bottom: 0; }
+.product-img-grid .form-group label { font-size: 11px; margin-bottom: 3px; }
+.product-img-grid .img-size-hint { display: none; }
+
+/* Preview area */
+.preview-area {
+  width: var(--preview-w); border-left: 1px solid var(--border); background: var(--white);
+  display: flex; flex-direction: column; flex-shrink: 0;
+}
+.preview-toolbar {
+  height: 40px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14px; border-bottom: 1px solid var(--border); background: var(--bg);
+  flex-shrink: 0;
+}
+.preview-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.preview-label .en { font-size: 11px; color: var(--text-muted); opacity: 0.6; }
+.device-toggle { display: flex; gap: 4px; }
+.device-btn {
+  width: 30px; height: 26px; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.device-btn:hover { border-color: var(--accent); }
+.device-btn.active { background: var(--primary); border-color: var(--primary); }
+.device-btn svg { width: 14px; height: 14px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; }
+.device-btn.active svg { stroke: var(--white); }
+.preview-frame-wrap {
+  flex: 1; overflow: hidden; display: flex; justify-content: center; align-items: flex-start;
+  background: var(--bg); padding: 0;
+}
+.preview-frame-wrap iframe {
+  width: 100%; height: 100%; border: none; background: var(--white);
+  transition: width 0.3s, max-width 0.3s;
+}
+.preview-frame-wrap iframe.mobile { max-width: 390px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+.preview-frame-wrap iframe.tablet { max-width: 768px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
+  background: var(--success); color: var(--white); padding: 10px 24px; border-radius: 6px;
+  font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  :root { --preview-w: 38%; }
+  .form-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .preview-area { display: none; }
+  .sidebar { width: 56px; }
+  .sidebar-item .label-zh, .sidebar-item .label-en { display: none; }
+  .sidebar-item { justify-content: center; padding: 14px; }
+  .topbar-title .en { display: none; }
+  .topbar-actions .btn span { display: none; }
+}
+/* ===== Login Overlay ===== */
+.login-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-overlay.hidden { display: none; }
+.login-card {
+  background: #fff; border-radius: 12px; padding: 40px 36px; width: 380px; max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4); text-align: center;
+}
+.login-card img { height: 50px; margin-bottom: 16px; }
+.login-card h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 4px; }
+.login-card .login-sub { font-size: 12px; color: #999; margin-bottom: 24px; }
+.login-card input {
+  width: 100%; padding: 12px 16px; border: 2px solid #e0ddd6; border-radius: 8px;
+  font-size: 15px; margin-bottom: 12px; transition: border-color 0.2s; box-sizing: border-box;
+}
+.login-card input:focus { outline: none; border-color: #c9a96e; }
+.login-card .login-btn {
+  width: 100%; padding: 12px; background: #c9a96e; color: #1a1a2e; border: none;
+  border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.login-card .login-btn:hover { background: #e8dcc8; }
+.login-error { color: #dc3545; font-size: 13px; margin-top: 10px; min-height: 18px; }
+.login-hint { font-size: 11px; color: #bbb; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+
+</style>
+</head>
+<body>
+
+<!-- ===== Login Overlay ===== -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <img src="logo.png" alt="WELLSHINEGOLD">
+    <h2>后台管理系统</h2>
+    <div class="login-sub">Admin Panel — Please enter your password</div>
+    <input type="password" id="loginPassword" placeholder="请输入管理密码 / Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" onclick="doLogin()">登录 / Login</button>
+    <div class="login-hint">输入正确密码后进入后台管理面板</div>
+  </div>
+</div>
+
+<!-- ===== Top Bar ===== -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <img src="logo.png" alt="WELLSHINEGOLD">
+    <div class="topbar-title">后台管理系统<span class="en">Admin Panel</span></div>
+  </div>
+  <div class="topbar-actions">
+    <span class="save-status" id="saveStatus">已保存 / Saved</span>
+    <button class="btn btn-secondary" onclick="openSite()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+      <span>新窗口预览</span>
+    </button>
+    <button class="btn btn-secondary" onclick="exportJSON()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>导出JSON</span>
+    </button>
+    <button class="btn btn-save" onclick="publishSite()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5z"/><path d="M12 11l4 4"/><path d="M16 11V7h-4"/></svg>
+      <span>发布网站</span>
+    </button>
+    <button class="btn btn-secondary" onclick="openCloudSettings()" id="cloudSettingsBtn" title="云端同步设置 / Cloud Sync Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
+      <span>云端设置</span>
+    </button>
+    <button class="btn btn-danger" onclick="resetContent()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      <span>重置</span>
+    </button>
+    <button class="btn btn-danger" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span>退出</span>
+    </button>
+    <button class="btn btn-save" onclick="saveContent()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+      <span>保存</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== Admin Body ===== -->
+<div class="admin-body">
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-item active" data-panel="hero">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span class="label-zh">首页大图</span><span class="label-en">Hero</span>
+    </div>
+    <div class="sidebar-item" data-panel="collections">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span class="label-zh">产品系列</span><span class="label-en">Collections</span>
+    </div>
+    <div class="sidebar-item" data-panel="about">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span class="label-zh">关于我们</span><span class="label-en">About</span>
+    </div>
+    <div class="sidebar-item" data-panel="stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <span class="label-zh">数据统计</span><span class="label-en">Stats</span>
+    </div>
+    <div class="sidebar-item" data-panel="services">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span class="label-zh">服务能力</span><span class="label-en">Services</span>
+    </div>
+    <div class="sidebar-item" data-panel="features">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      <span class="label-zh">核心优势</span><span class="label-en">Advantages</span>
+    </div>
+    <div class="sidebar-item" data-panel="testimonials">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      <span class="label-zh">客户评价</span><span class="label-en">Reviews</span>
+    </div>
+    <div class="sidebar-item" data-panel="contact">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <span class="label-zh">联系方式</span><span class="label-en">Contact</span>
+    </div>
+    <div class="sidebar-item" data-panel="footer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z M14 10l-4 4 M10 10l4 4"/></svg>
+      <span class="label-zh">页脚信息</span><span class="label-en">Footer</span>
+    </div>
+  </div>
+
+  <!-- Form Area -->
+  <div class="form-area" id="formArea">
+    <!-- Panels generated by JS -->
+  </div>
+
+  <!-- Preview Area -->
+  <div class="preview-area">
+    <div class="preview-toolbar">
+      <div class="preview-label">实时预览 <span class="en">Live Preview</span></div>
+      <div class="device-toggle">
+        <div class="device-btn active" data-device="desktop" onclick="setDevice('desktop')" title="桌面 / Desktop">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="device-btn" data-device="tablet" onclick="setDevice('tablet')" title="平板 / Tablet">
+          <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        </div>
+        <div class="device-btn" data-device="mobile" onclick="setDevice('mobile')" title="手机 / Mobile">
+          <svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="preview-frame-wrap">
+      <iframe src="index.html" id="previewFrame" title="Live Preview"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- Publish Overlay -->
+<div class="login-overlay hidden" id="publishOverlay" style="z-index: 99998; background: rgba(26,26,46,0.85);">
+  <div class="login-card" style="text-align: left; width: 520px;">
+    <div style="text-align: center; margin-bottom: 18px;">
+      <img src="logo.png" alt="WELLSHINEGOLD" style="height: 44px;">
+      <h2 style="font-size: 18px;">发布网站 / Publish Site</h2>
+    </div>
+    <div style="font-size: 13px; color: #555; line-height: 1.8; margin-bottom: 18px;">
+      <p style="margin-bottom: 10px;"><strong>当前站点为纯静态网站，没有服务器后端。</strong>后台保存的内容只存在本浏览器中，要让全世界访客看到最新内容，需要把 content.json 重新部署到 Netlify。</p>
+      <p style="margin-bottom: 10px;"><strong>This is a static site with no backend.</strong> Content saved in admin is stored only in this browser. To update the public site, you must redeploy <code style="background:#f0f0f0;padding:2px 5px;border-radius:3px;">content.json</code> to Netlify.</p>
+      <ol style="margin-left: 18px; margin-bottom: 12px;">
+        <li>点击下方「下载 content.json」按钮 / Click <strong>Download content.json</strong> below.</li>
+        <li>用下载的文件替换项目文件夹里的 <code style="background:#f0f0f0;padding:2px 5px;border-radius:3px;">content.json</code> / Replace the old <code style="background:#f0f0f0;padding:2px 5px;border-radius:3px;">content.json</code> in your project folder.</li>
+        <li>重新上传到 Netlify 完成发布 / Re-upload to Netlify to publish.</li>
+      </ol>
+      <p style="color: #888; font-size: 12px;">提示：下载的 content.json 已包含所有原始画质图片（base64），可直接部署。/ The downloaded file already contains all original-quality images.</p>
+      <p style="color: #c0392b; font-size: 12px; font-weight: 500;">自查：下载后请确认文件大小——包含图片通常有 500KB 以上（几 MB 正常）。如果下载的文件只有十几 KB，说明图片没有进入 content.json，请先「保存」再重新下载。 / Check: after downloading, the file should be 500KB+ (several MB is normal). If it is only ~10KB, Save first, then download again.</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 14px 0;">
+      <p style="color: #2c3e50; font-size: 13px; font-weight: 500; margin-bottom: 6px;">⚠️ 桌面端与手机端必须看到同一份内容 / Desktop & Mobile must show the same content</p>
+      <p style="font-size: 12px; color: #555; line-height: 1.7; margin-bottom: 0;">
+        本网站是静态部署，<strong>线上文件</strong>才是全世界访客（包括你手机）看到的版本。如果只在后台保存而没有按下方步骤重新部署，手机端将一直显示最初的默认模板。/ This is a static site. Only the <strong>deployed files</strong> are seen by visitors (including your phone). If you only Save but do not redeploy below, mobile will keep showing the default template.
+      </p>
+      <p style="font-size: 12px; color: #555; line-height: 1.7; margin-top: 8px; margin-bottom: 0;">
+        验证方法：部署完成后，用<strong>手机无痕窗口</strong>（或另一台设备）访问 wellshinegold.com，看到的内容必须与后台预览一致。/ Verify: after deploy, open wellshinegold.com in an <strong>incognito/private window on your phone</strong> — it must match the admin preview.
+      </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button class="login-btn" onclick="doPublishDownload()" style="flex:1;">下载 content.json / Download</button>
+      <button onclick="closePublishOverlay()" style="flex:1; padding: 12px; background: #f0f0f0; color: #555; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer;">取消 / Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cloud Sync Settings Overlay -->
+<div class="login-overlay hidden" id="cloudSettingsOverlay" style="z-index: 99998; background: rgba(26,26,46,0.85);">
+  <div class="login-card" style="text-align: left; width: 540px; max-height: 90vh; overflow-y: auto;">
+    <div style="text-align: center; margin-bottom: 18px;">
+      <img src="logo.png" alt="WELLSHINEGOLD" style="height: 44px;">
+      <h2 style="font-size: 18px;">云端同步设置 / Cloud Sync Settings</h2>
+    </div>
+    <div style="font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 16px;">
+      <p style="margin-bottom: 8px;">配置 GitHub 后，每次「保存」会自动把最新内容同步到线上，<strong>1-2 分钟后全网访客（含手机端）即可看到更新</strong>，无需手动部署。</p>
+      <p style="color: #888; font-size: 12px;">After configuring GitHub, every Save auto-syncs to the live site. Visitors see updates in 1-2 minutes. No manual deploy needed.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;">
+      <div>
+        <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">GitHub 用户名 / Username</label>
+        <input type="text" id="ghOwner" placeholder="例如 your-username" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">仓库名 / Repository</label>
+        <input type="text" id="ghRepo" placeholder="例如 wellshinegold-website" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">分支名 / Branch</label>
+        <input type="text" id="ghBranch" placeholder="main" value="main" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">文件路径 / File Path</label>
+        <input type="text" id="ghPath" placeholder="content.json" value="content.json" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">Personal Access Token</label>
+        <input type="password" id="ghToken" placeholder="github_pat_..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+        <p style="font-size: 11px; color: #999; margin-top: 4px;">Token 只存在你的浏览器本地，不会上传到任何服务器。/ Token is stored only in your browser.</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button class="login-btn" onclick="saveCloudSettings()" style="flex:1;">保存设置 / Save</button>
+      <button onclick="testCloudSync()" style="flex:1; padding: 12px; background: #27ae60; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer;">测试连接 / Test</button>
+      <button onclick="closeCloudSettings()" style="flex:1; padding: 12px; background: #f0f0f0; color: #555; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer;">取消 / Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+var content = {};
+var STORAGE_KEY = 'site_content';
+var isDirty = false;
+var previewReady = false;
+
+// ===== Load content =====
+// Load the shrunk version from localStorage, then expand "@img:GUID"
+// placeholders back to full base64 using IndexedDB. The in-memory
+// `content` always holds full base64 values.
+async function loadContent() {
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+  if (stored) {
+    content = stored;
+    // Pull all images from IndexedDB and replace placeholders
+    try {
+      var images = await getAllImages();
+      (function walk(o) {
+        if (typeof o === 'string') {
+          if (o.indexOf('@img:') === 0) {
+            var guid = o.slice(5);
+            return images[guid] || '';
+          }
+          return o;
+        }
+        if (Array.isArray(o)) { for (var i = 0; i < o.length; i++) o[i] = walk(o[i]); return o; }
+        if (o && typeof o === 'object') { Object.keys(o).forEach(function(k) { o[k] = walk(o[k]); }); return o; }
+        return o;
+      })(content);
+    } catch(e) { console.error('Failed to load images from IndexedDB', e); }
+    renderPanels();
+    return;
+  }
+  // First time: load defaults from content.json
+  try {
+    var data = await fetch('content.json').then(function(r) { return r.json(); });
+    content = data;
+    renderPanels();
+  } catch(e) {
+    showToast('加载失败 / Load failed', 'error');
+  }
+}
+
+// ===== Get/Set nested values =====
+function getVal(path) {
+  var keys = path.split('.');
+  var val = content;
+  for (var i = 0; i < keys.length; i++) {
+    if (val == null) return '';
+    val = val[keys[i]];
+  }
+  return val == null ? '' : val;
+}
+function setVal(path, value) {
+  var keys = path.split('.');
+  var obj = content;
+  for (var i = 0; i < keys.length - 1; i++) {
+    if (obj[keys[i]] == null) obj[keys[i]] = {};
+    obj = obj[keys[i]];
+  }
+  obj[keys[keys.length - 1]] = value;
+}
+
+// ===== Bilingual label helper =====
+function biLabel(zh, en) {
+  return '<span class="zh">' + zh + '</span><span class="en">/ ' + en + '</span>';
+}
+
+// ===== Render all panels =====
+function renderPanels() {
+  var main = document.getElementById('formArea');
+  main.innerHTML = '';
+
+  // === Hero ===
+  main.innerHTML += panel('hero',
+    '首页大图', 'Hero Section',
+    '访客第一眼看到的区域。主标题、描述和关键数据。The first section visitors see.',
+    [
+      section('主要内容 / Main Content', [
+        row([field('hero.title', biLabel('主标题', 'Main Title')), field('hero.titleAccent', biLabel('强调标题（金色）', 'Accent Title (Gold)'))]),
+        field('hero.description', biLabel('描述文字', 'Description'), 'textarea'),
+        row([field('hero.btn1Text', biLabel('按钮一 文字', 'Button 1 Text')), field('hero.btn1Link', biLabel('按钮一 链接', 'Button 1 Link'))]),
+        row([field('hero.btn2Text', biLabel('按钮二 文字', 'Button 2 Text')), field('hero.btn2Link', biLabel('按钮二 链接', 'Button 2 Link'))]),
+      ]),
+      section('数据徽章 / Statistics Badges', [
+        row([field('hero.stat1Num', biLabel('数据一 数字', 'Stat 1 Number')), field('hero.stat1Label', biLabel('数据一 标签', 'Stat 1 Label'))]),
+        row([field('hero.stat2Num', biLabel('数据二 数字', 'Stat 2 Number')), field('hero.stat2Label', biLabel('数据二 标签', 'Stat 2 Label'))]),
+        row([field('hero.stat3Num', biLabel('数据三 数字', 'Stat 3 Number')), field('hero.stat3Label', biLabel('数据三 标签', 'Stat 3 Label'))]),
+      ]),
+      section('背景图片 / Background Image', [
+        imgField('hero.image', biLabel('首页大图', 'Hero Background Image'), 1920, '1920 × 1080 px（宽屏横图 / Landscape）'),
+      ]),
+    ]);
+
+  // === Collections ===
+  var colItems = '';
+  for (var i = 0; i < 4; i++) {
+    // Category-level fields
+    var catFields = [
+      field('collections.items.' + i + '.name', biLabel('分类名称', 'Category Name')),
+      field('collections.items.' + i + '.desc', biLabel('分类描述', 'Category Description'), 'textarea'),
+      imgField('collections.items.' + i + '.image', biLabel('分类封面图', 'Category Cover Image'), 800, '600 × 600 px（正方形 / Square）'),
+    ];
+
+    // Products within this category
+    var products = getVal('collections.items.' + i + '.products') || [];
+    var productHtml = '';
+    for (var j = 0; j < products.length; j++) {
+      productHtml += '<div class="product-sub-item">';
+      productHtml += '<div class="product-sub-header"><span>产品 ' + (j+1) + ' / Product ' + (j+1) + '</span><button class="btn-remove-product" onclick="removeProduct(' + i + ',' + j + ')" title="删除 / Remove">&times;</button></div>';
+      productHtml += field('collections.items.' + i + '.products.' + j + '.name', biLabel('产品名称', 'Product Name'));
+      productHtml += field('collections.items.' + i + '.products.' + j + '.desc', biLabel('产品描述', 'Product Description'), 'textarea');
+      // 4 image fields in a 2x2 grid
+      productHtml += '<div class="product-img-grid">';
+      for (var k = 0; k < 4; k++) {
+        productHtml += imgField('collections.items.' + i + '.products.' + j + '.images.' + k, biLabel('图片 ' + (k+1), 'Image ' + (k+1)), 600, '600 × 600 px（正方形 / Square）');
+      }
+      productHtml += '</div>';
+      productHtml += '</div>';
+    }
+    catFields.push('<div class="products-sub-section">' +
+      '<div class="products-sub-title"><span>具体产品 / Products (' + products.length + ')</span>' +
+      '<button class="btn-add-product" onclick="addProduct(' + i + ')">+ 添加产品 / Add Product</button></div>' +
+      (productHtml || '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">暂无产品，点击上方按钮添加 / No products yet. Click above to add.</div>') +
+      '</div>');
+
+    colItems += arrayItem('分类 ' + (i+1) + ' / Category ' + (i+1), catFields);
+  }
+  main.innerHTML += panel('collections',
+    '产品系列', 'Collections',
+    '首页展示的产品分类卡片。Product category cards on the homepage.',
+    [
+      section('板块标题 / Section Header', [
+        field('collections.label', biLabel('标签（小字）', 'Label (Small Text)')),
+        field('collections.title', biLabel('主标题', 'Title')),
+        field('collections.subtitle', biLabel('副标题', 'Subtitle'), 'textarea'),
+      ]),
+      section('产品列表 / Products', colItems),
+    ]);
+
+  // === About ===
+  main.innerHTML += panel('about',
+    '关于我们', 'About Us',
+    '公司介绍和品牌故事。Company introduction and story.',
+    [
+      section('内容 / Content', [
+        field('about.title', biLabel('板块标题', 'Section Title')),
+        field('about.p1', biLabel('段落一', 'Paragraph 1'), 'textarea'),
+        field('about.p2', biLabel('段落二', 'Paragraph 2'), 'textarea'),
+        field('about.p3', biLabel('段落三', 'Paragraph 3'), 'textarea'),
+        imgField('about.image', biLabel('公司图片', 'About Image'), 800, '800 × 600 px（宽屏横图 / Landscape）'),
+      ]),
+    ]);
+
+  // === Stats ===
+  var statsItems = '';
+  for (var i = 0; i < 4; i++) {
+    statsItems += arrayItem('数据 ' + (i+1) + ' / Stat ' + (i+1), [
+      row([field('stats.' + i + '.num', biLabel('数字', 'Number')), field('stats.' + i + '.label', biLabel('标签', 'Label'))]),
+    ]);
+  }
+  main.innerHTML += panel('stats',
+    '数据统计', 'Statistics',
+    '深色背景条上显示的关键数字。Key numbers in the dark band.',
+    [
+      section('统计数据 / Statistics', statsItems),
+    ]);
+
+  // === Services ===
+  var svcItems = '';
+  for (var i = 0; i < 4; i++) {
+    svcItems += arrayItem('服务 ' + (i+1) + ' / Service ' + (i+1), [
+      field('services.items.' + i + '.title', biLabel('服务标题', 'Service Title')),
+      field('services.items.' + i + '.desc', biLabel('服务描述', 'Description'), 'textarea'),
+    ]);
+  }
+  main.innerHTML += panel('services',
+    '服务能力', 'Services',
+    '你提供的制造服务项目。Manufacturing services you offer.',
+    [
+      section('板块标题 / Section Header', [
+        field('services.label', biLabel('标签', 'Label')),
+        field('services.title', biLabel('主标题', 'Title')),
+        field('services.subtitle', biLabel('副标题', 'Subtitle'), 'textarea'),
+      ]),
+      section('服务列表 / Services', svcItems),
+    ]);
+
+  // === Features ===
+  var featItems = '';
+  for (var i = 0; i < 4; i++) {
+    featItems += arrayItem('优势 ' + (i+1) + ' / Feature ' + (i+1), [
+      row([field('features.items.' + i + '.num', biLabel('编号', 'Number')), field('features.items.' + i + '.title', biLabel('标题', 'Title'))]),
+      field('features.items.' + i + '.desc', biLabel('描述', 'Description'), 'textarea'),
+    ]);
+  }
+  main.innerHTML += panel('features',
+    '核心优势', 'Why Choose Us',
+    '你的核心竞争优势。Core competitive advantages.',
+    [
+      section('板块标题 / Section Header', [
+        field('features.label', biLabel('标签', 'Label')),
+        field('features.title', biLabel('主标题', 'Title')),
+        field('features.subtitle', biLabel('副标题', 'Subtitle'), 'textarea'),
+      ]),
+      section('优势列表 / Features', featItems),
+    ]);
+
+  // === Testimonials ===
+  var revItems = '';
+  for (var i = 0; i < 3; i++) {
+    revItems += arrayItem('评价 ' + (i+1) + ' / Review ' + (i+1), [
+      field('testimonials.items.' + i + '.quote', biLabel('评价内容', 'Quote'), 'textarea'),
+      row([field('testimonials.items.' + i + '.name', biLabel('客户姓名', 'Client Name')), field('testimonials.items.' + i + '.avatar', biLabel('头像字母', 'Avatar Letter'))]),
+      field('testimonials.items.' + i + '.meta', biLabel('职位 / 公司', 'Title / Company')),
+    ]);
+  }
+  main.innerHTML += panel('testimonials',
+    '客户评价', 'Client Reviews',
+    '客户评价和推荐语。Customer testimonials.',
+    [
+      section('板块标题 / Section Header', [
+        field('testimonials.label', biLabel('标签', 'Label')),
+        field('testimonials.title', biLabel('主标题', 'Title')),
+        field('testimonials.subtitle', biLabel('副标题', 'Subtitle'), 'textarea'),
+      ]),
+      section('评价列表 / Reviews', revItems),
+    ]);
+
+  // === Contact ===
+  main.innerHTML += panel('contact',
+    '联系方式', 'Contact & WhatsApp',
+    '联系信息和 WhatsApp 聊天链接。Contact info and WhatsApp chat link.',
+    [
+      section('板块标题 / Section Header', [
+        field('contact.title', biLabel('标题', 'Title')),
+        field('contact.subtitle', biLabel('副标题', 'Subtitle'), 'textarea'),
+      ]),
+      section('联系详情 / Contact Details', [
+        field('contact.email', biLabel('邮箱地址', 'Email Address')),
+        row([field('contact.whatsappDisplay', biLabel('WhatsApp 显示号码', 'WhatsApp (Display)')), field('contact.whatsappLink', biLabel('WhatsApp 跳转链接', 'WhatsApp Link'))]),
+        '<div class="form-group"><div class="hint">WhatsApp 链接格式：https://wa.me/国家码+号码（例如 https://wa.me/8613800138000）</div></div>',
+        field('contact.address', biLabel('工厂地址', 'Factory Address')),
+        field('contact.responseTime', biLabel('响应时间', 'Response Time')),
+      ]),
+      section('表单邮件设置 / Form Email Settings', [
+        '<div class="form-group"><div class="hint">访客提交询盘表单后，系统会通过 EmailJS 自动发送邮件到下方邮箱。Form submissions will be emailed via EmailJS.</div></div>',
+        field('contact.formEmail', biLabel('表单接收邮箱 / Recipient Email', 'Email receiving inquiries')),
+        field('contact.emailjsServiceId', biLabel('EmailJS Service ID', 'EmailJS Service ID')),
+        field('contact.emailjsTemplateId', biLabel('EmailJS Template ID', 'EmailJS Template ID')),
+        field('contact.emailjsPublicKey', biLabel('EmailJS Public Key', 'EmailJS Public Key')),
+        '<div class="form-group"><div class="hint">配置步骤 / Setup: 1) 注册 emailjs.com（免费 200 封/月）→ 2) 添加 Email Service（如 Gmail）→ 3) 创建 Template，To Email 填写 {{to_email}}，变量包含 from_name / from_email / company / country / phone / quantity / product / message → 4) 把 Service ID、Template ID、Public Key 填入上方。</div></div>',
+      ]),
+    ]);
+
+  // === Footer ===
+  main.innerHTML += panel('footer',
+    '页脚信息', 'Footer',
+    '页脚描述、版权信息和社交媒体链接。Footer description, copyright and social links.',
+    [
+      section('内容 / Content', [
+        field('footer.description', biLabel('公司描述', 'Description'), 'textarea'),
+        field('footer.copyright', biLabel('版权信息', 'Copyright Text')),
+      ]),
+      section('社交媒体链接 / Social Links', [
+        field('footer.socialInstagram', biLabel('Instagram 链接', 'Instagram URL')),
+        field('footer.socialFacebook', biLabel('Facebook 链接', 'Facebook URL')),
+        field('footer.socialWhatsApp', biLabel('WhatsApp 链接', 'WhatsApp URL')),
+      ]),
+    ]);
+
+  // Populate fields and bind events
+  populateFields();
+  updateImagePreviews();
+  setupImageUploads();
+}
+
+// ===== HTML helpers =====
+function panel(id, titleZh, titleEn, desc, sections) {
+  return '<div class="panel" id="panel-' + id + '">' +
+    '<div class="panel-header">' +
+    '<div class="panel-title">' + titleZh + '<span class="en">' + titleEn + '</span></div>' +
+    '<div class="panel-desc">' + desc + '</div>' +
+    '</div>' + sections.join('') + '</div>';
+}
+function section(title, content) {
+  return '<div class="form-section"><div class="form-section-title">' + title + '</div>' + content + '</div>';
+}
+function row(fields) {
+  return '<div class="form-row">' + fields.join('') + '</div>';
+}
+function field(key, label, type) {
+  return '<div class="form-group">' +
+    '<label>' + label + '</label>' +
+    (type === 'textarea'
+      ? '<textarea data-key="' + key + '">' + getVal(key) + '</textarea>'
+      : '<input type="text" data-key="' + key + '" value="' + getVal(key) + '">') +
+    '</div>';
+}
+function imgField(key, label, maxWidth, recommendedSize) {
+  maxWidth = maxWidth || 800;
+  var val = getVal(key);
+  var sizeHint = recommendedSize
+    ? '<div class="img-size-hint">' +
+      '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' +
+      '<span>推荐尺寸 / Recommended: <strong>' + recommendedSize + '</strong></span>' +
+      '</div>'
+    : '';
+  return '<div class="form-group">' +
+    '<label>' + label + '</label>' +
+    sizeHint +
+    '<div class="img-upload-component">' +
+      '<div class="img-upload-zone' + (val ? ' has-image' : '') + '" data-upload-zone="' + key + '" data-max-width="' + maxWidth + '">' +
+        '<div class="img-preview" data-preview-for="' + key + '"></div>' +
+        '<div class="img-upload-placeholder">' +
+          '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+          '<span>点击上传或拖拽图片到此 / Click or drag image here</span>' +
+        '</div>' +
+      '</div>' +
+      '<input type="file" accept="image/*" data-file-input="' + key + '" style="display:none;">' +
+      '<input type="text" data-key="' + key + '" value="' + val + '" class="img-input" placeholder="或粘贴图片链接 / Or paste image URL">' +
+    '</div>' +
+    '</div>';
+}
+function arrayItem(title, fields) {
+  return '<div class="array-item"><div class="array-item-header">' + title + '</div>' + fields.join('') + '</div>';
+}
+
+// ===== Populate fields & bind live update =====
+function populateFields() {
+  document.querySelectorAll('[data-key]').forEach(function(el) {
+    var key = el.getAttribute('data-key');
+    el.value = getVal(key);
+    el.addEventListener('input', function() {
+      setVal(key, el.value);
+      markDirty();
+      if (el.classList.contains('img-input')) {
+        updateImagePreviews();
+      }
+      sendToPreview();
+    });
+  });
+}
+
+// ===== Update image previews =====
+function updateImagePreviews() {
+  document.querySelectorAll('.img-input').forEach(function(input) {
+    var key = input.getAttribute('data-key');
+    var preview = document.querySelector('[data-preview-for="' + key + '"]');
+    var zone = document.querySelector('[data-upload-zone="' + key + '"]');
+    if (preview && input.value) {
+      preview.style.backgroundImage = "url('" + input.value + "')";
+      if (zone) zone.classList.add('has-image');
+    } else if (preview) {
+      preview.style.backgroundImage = 'none';
+      if (zone) zone.classList.remove('has-image');
+    }
+  });
+}
+
+// ===== Image upload: store as original base64 (NO compression) =====
+// Images are stored in IndexedDB (not localStorage) to bypass the 5MB
+// localStorage quota. localStorage only keeps a tiny placeholder like
+// "@img:abc123", so the user can upload as many original-quality images
+// as they want without ever hitting a size limit.
+function processImageUpload(file, key) {
+  var zone = document.querySelector('[data-upload-zone="' + key + '"]');
+  zone.classList.add('uploading');
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var dataUrl = e.target.result; // original quality, no canvas, no compression
+    var input = document.querySelector('[data-key="' + key + '"]');
+    input.value = dataUrl;
+    setVal(key, dataUrl);
+    updateImagePreviews();
+    markDirty();
+    sendToPreview();
+
+    zone.classList.remove('uploading');
+    var sizeKB = Math.round(dataUrl.length * 0.75 / 1024);
+    showToast('图片已上传 (' + sizeKB + 'KB, 原画质) / Image uploaded (original quality)', 'success');
+  };
+  reader.onerror = function() {
+    zone.classList.remove('uploading');
+    showToast('文件读取失败 / Failed to read file', 'error');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== Setup upload zones: click, drag&drop, file input =====
+function setupImageUploads() {
+  document.querySelectorAll('[data-upload-zone]').forEach(function(zone) {
+    var key = zone.getAttribute('data-upload-zone');
+    var fileInput = document.querySelector('[data-file-input="' + key + '"]');
+    if (!fileInput) return;
+    
+    // Click to open file picker
+    zone.addEventListener('click', function(e) {
+      if (e.target.classList.contains('img-input')) return;
+      fileInput.click();
+    });
+    
+    // Drag and drop
+    zone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', function() {
+      zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      var file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        processImageUpload(file, key);
+      } else {
+        showToast('请上传图片文件 / Please upload an image file', 'error');
+      }
+    });
+  });
+  
+  document.querySelectorAll('[data-file-input]').forEach(function(input) {
+    var key = input.getAttribute('data-file-input');
+    input.addEventListener('change', function() {
+      var file = input.files[0];
+      if (file) {
+        processImageUpload(file, key);
+        input.value = ''; // reset so same file can be re-selected
+      }
+    });
+  });
+}
+
+// ===== Real-time preview via postMessage =====
+var sendTimer = null;
+function sendToPreview() {
+  if (sendTimer) clearTimeout(sendTimer);
+  sendTimer = setTimeout(function() {
+    var iframe = document.getElementById('previewFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({
+        type: 'content-update',
+        content: content
+      }, '*');
+    }
+  }, 200);
+}
+
+// ===== Dirty / Save status =====
+function markDirty() {
+  isDirty = true;
+  var el = document.getElementById('saveStatus');
+  el.textContent = '未保存 / Unsaved';
+  el.className = 'save-status dirty';
+}
+function markSaved() {
+  isDirty = false;
+  var el = document.getElementById('saveStatus');
+  el.textContent = '已保存 / Saved';
+  el.className = 'save-status saved';
+}
+
+// ===== Save =====
+// Strategy: localStorage only stores text + tiny "@img:GUID" placeholders
+// (so it never hits the 5MB quota). Original-quality base64 images are
+// stored in IndexedDB, which has a much larger quota (hundreds of MB).
+// The in-memory `content` object always holds the full base64 values,
+// so previews and exports work as before.
+async function saveContent() {
+  // Sync all input values into content first
+  document.querySelectorAll('[data-key]').forEach(function(el) {
+    var key = el.getAttribute('data-key');
+    setVal(key, el.value);
+  });
+
+  // Shrink: replace every base64 image with a "@img:GUID" placeholder,
+  // collect the actual base64 strings into a map keyed by GUID.
+  var images = {};
+  var shrunk = JSON.parse(JSON.stringify(content));
+  (function walk(o) {
+    if (typeof o === 'string') {
+      if (o.indexOf('data:image/') === 0) {
+        var guid = 'img_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+        images[guid] = o;
+        return '@img:' + guid;
+      }
+      return o;
+    }
+    if (Array.isArray(o)) { for (var i = 0; i < o.length; i++) o[i] = walk(o[i]); return o; }
+    if (o && typeof o === 'object') { Object.keys(o).forEach(function(k) { o[k] = walk(o[k]); }); return o; }
+    return o;
+  })(shrunk);
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(shrunk));
+  } catch(e) {
+    // Even the shrunk version failed - extremely unlikely (text-only)
+    showToast('保存失败：内容异常 / Save failed: unexpected error', 'error');
+    return;
+  }
+
+  // Persist all images to IndexedDB (replace previous set)
+  try {
+    await clearImages();
+    var keys = Object.keys(images);
+    for (var i = 0; i < keys.length; i++) {
+      await putImage(keys[i], images[keys[i]]);
+    }
+  } catch(e) {
+    showToast('图片存储失败 / Image storage failed', 'error');
+    return;
+  }
+
+  markSaved();
+  sendToPreview();
+
+  // Cloud sync: if GitHub is configured, push images and a slim content.json.
+  // Netlify (connected to the repo) will auto-deploy in 1-2 minutes.
+  var cfg = getGithubConfig();
+  if (cfg.token && cfg.owner && cfg.repo) {
+    showToast('正在同步到云端... / Syncing to cloud...', 'info');
+    try {
+      var prepared = prepareCloudContent(content);
+      // Upload each image as a separate binary file first
+      if (prepared.images.length > 0) {
+        showToast('正在上传 ' + prepared.images.length + ' 张原图到云端... / Uploading images...', 'info');
+        for (var i = 0; i < prepared.images.length; i++) {
+          var img = prepared.images[i];
+          await githubCommitFile(cfg, img.path, {base64: img.base64}, 'Upload image ' + img.filename);
+        }
+      }
+      // Then upload the slim content.json (only image paths, no base64)
+      await githubCommitFile(cfg, cfg.path || 'content.json', prepared.json, 'Update site content via admin panel');
+      showToast('保存成功！云端已同步，1-2 分钟后全网更新 / Saved & synced! Live in 1-2 min', 'success');
+    } catch(e) {
+      console.error('Cloud sync failed:', e);
+      showToast('本地已保存，云端同步失败：' + (e.message || e) + ' / Local saved, cloud sync failed', 'error');
+    }
+  } else {
+    showToast('保存成功！点击「发布网站」即可部署到线上 / Saved! Click Publish to deploy.', 'success');
+  }
+}
+
+// ===== GitHub Cloud Sync =====
+var GITHUB_CONFIG_KEY = 'github_config';
+
+function getGithubConfig() {
+  try { return JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY)) || {}; } catch(e) { return {}; }
+}
+
+function setGithubConfig(cfg) {
+  localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(cfg));
+}
+
+function openCloudSettings() {
+  var cfg = getGithubConfig();
+  document.getElementById('ghOwner').value = cfg.owner || '';
+  document.getElementById('ghRepo').value = cfg.repo || '';
+  document.getElementById('ghBranch').value = cfg.branch || 'main';
+  document.getElementById('ghPath').value = cfg.path || 'content.json';
+  document.getElementById('ghToken').value = cfg.token || '';
+  document.getElementById('cloudSettingsOverlay').classList.remove('hidden');
+}
+
+function closeCloudSettings() {
+  document.getElementById('cloudSettingsOverlay').classList.add('hidden');
+}
+
+function saveCloudSettings() {
+  var cfg = {
+    owner: document.getElementById('ghOwner').value.trim(),
+    repo: document.getElementById('ghRepo').value.trim(),
+    branch: document.getElementById('ghBranch').value.trim() || 'main',
+    path: document.getElementById('ghPath').value.trim() || 'content.json',
+    token: document.getElementById('ghToken').value.trim()
+  };
+  setGithubConfig(cfg);
+  updateCloudBtnStatus();
+  closeCloudSettings();
+  if (cfg.token && cfg.owner && cfg.repo) {
+    showToast('云端同步已启用！下次保存将自动同步到线上 / Cloud sync enabled! Next save auto-syncs.', 'success');
+  } else {
+    showToast('云端同步已关闭（信息不完整）/ Cloud sync disabled (incomplete)', 'info');
+  }
+}
+
+function updateCloudBtnStatus() {
+  var cfg = getGithubConfig();
+  var btn = document.getElementById('cloudSettingsBtn');
+  if (!btn) return;
+  if (cfg.token && cfg.owner && cfg.repo) {
+    btn.style.background = '#27ae60';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#27ae60';
+  }
+}
+
+async function testCloudSync() {
+  var cfg = {
+    owner: document.getElementById('ghOwner').value.trim(),
+    repo: document.getElementById('ghRepo').value.trim(),
+    branch: document.getElementById('ghBranch').value.trim() || 'main',
+    path: document.getElementById('ghPath').value.trim() || 'content.json',
+    token: document.getElementById('ghToken').value.trim()
+  };
+  if (!cfg.token || !cfg.owner || !cfg.repo) {
+    showToast('请先填写完整信息 / Please fill in all fields', 'error');
+    return;
+  }
+  showToast('测试连接中... / Testing connection...', 'info');
+  try {
+    var headers = {
+      'Authorization': 'token ' + cfg.token,
+      'Accept': 'application/vnd.github+json'
+    };
+    var res = await fetch('https://api.github.com/repos/' + cfg.owner + '/' + cfg.repo + '/git/refs/heads/' + cfg.branch, {headers: headers});
+    if (res.ok) {
+      showToast('连接成功！仓库和分支可访问 / Connection OK! Repo & branch accessible.', 'success');
+    } else if (res.status === 401) {
+      showToast('Token 无效或已过期 / Token invalid or expired', 'error');
+    } else if (res.status === 404) {
+      showToast('仓库或分支不存在（确认拼写和权限）/ Repo or branch not found', 'error');
+    } else {
+      showToast('连接异常：HTTP ' + res.status + ' / Connection error: HTTP ' + res.status, 'error');
+    }
+  } catch(e) {
+    showToast('网络错误：' + e.message + ' / Network error', 'error');
+  }
+}
+
+// Commit a file to GitHub via Git Data API (handles files up to 100MB).
+// `content` can be:
+//   - a string (JSON/text): encoded as UTF-8 then base64
+//   - an object {base64: 'rawBase64String'}: used directly for binary files (images)
+async function githubCommitFile(cfg, path, content, message) {
+  var owner = cfg.owner, repo = cfg.repo, branch = cfg.branch || 'main', token = cfg.token;
+  var headers = {
+    'Authorization': 'token ' + token,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json'
+  };
+  var api = 'https://api.github.com/repos/' + owner + '/' + repo;
+
+  // 1. Get current branch ref (commit SHA)
+  var refRes = await fetch(api + '/git/refs/heads/' + branch, {headers: headers});
+  if (!refRes.ok) {
+    if (refRes.status === 401) throw new Error('Token 无效 / Token invalid');
+    if (refRes.status === 404) throw new Error('分支 ' + branch + ' 不存在 / Branch not found');
+    throw new Error('读取分支失败 HTTP ' + refRes.status);
+  }
+  var ref = await refRes.json();
+  var commitSha = ref.object.sha;
+
+  // 2. Get current commit's tree SHA
+  var commitRes = await fetch(api + '/git/commits/' + commitSha, {headers: headers});
+  if (!commitRes.ok) throw new Error('读取 commit 失败');
+  var commitObj = await commitRes.json();
+  var treeSha = commitObj.tree.sha;
+
+  // 3. Create blob (base64-encoded content, supports files up to 100MB)
+  var b64;
+  if (typeof content === 'string') {
+    try {
+      b64 = btoa(unescape(encodeURIComponent(content)));
+    } catch(e) {
+      throw new Error('内容编码失败 / Encoding failed');
+    }
+  } else if (content && typeof content.base64 === 'string') {
+    b64 = content.base64;
+  } else {
+    throw new Error('内容格式错误 / Invalid content format');
+  }
+  var blobRes = await fetch(api + '/git/blobs', {
+    method: 'POST', headers: headers,
+    body: JSON.stringify({content: b64, encoding: 'base64'})
+  });
+  if (!blobRes.ok) throw new Error('创建 blob 失败 HTTP ' + blobRes.status);
+  var blob = await blobRes.json();
+
+  // 4. Create new tree (replace the target file)
+  var treeRes = await fetch(api + '/git/trees', {
+    method: 'POST', headers: headers,
+    body: JSON.stringify({
+      base_tree: treeSha,
+      tree: [{path: path, mode: '100644', type: 'blob', sha: blob.sha}]
+    })
+  });
+  if (!treeRes.ok) throw new Error('创建 tree 失败 HTTP ' + treeRes.status);
+  var tree = await treeRes.json();
+
+  // 5. Create commit
+  var newCommitRes = await fetch(api + '/git/commits', {
+    method: 'POST', headers: headers,
+    body: JSON.stringify({
+      message: message,
+      tree: tree.sha,
+      parents: [commitSha]
+    })
+  });
+  if (!newCommitRes.ok) throw new Error('创建 commit 失败 HTTP ' + newCommitRes.status);
+  var newCommit = await newCommitRes.json();
+
+  // 6. Update branch ref to point to new commit
+  var updateRefRes = await fetch(api + '/git/refs/heads/' + branch, {
+    method: 'PATCH', headers: headers,
+    body: JSON.stringify({sha: newCommit.sha})
+  });
+  if (!updateRefRes.ok) throw new Error('更新分支失败 HTTP ' + updateRefRes.status);
+  return newCommit.sha;
+}
+
+// ===== IndexedDB helpers for image storage =====
+var DB_NAME = 'wellsbinegold_admin';
+var DB_STORE = 'images';
+var dbPromise = null;
+
+function getDB() {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise(function(resolve, reject) {
+    if (!window.indexedDB) { reject(new Error('IndexedDB not supported')); return; }
+    var req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+    };
+    req.onsuccess = function(e) { resolve(e.target.result); };
+    req.onerror = function(e) { reject(e.target.error); };
+  });
+  return dbPromise;
+}
+
+function putImage(guid, base64) {
+  return getDB().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(base64, guid);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function() { reject(tx.error); };
+    });
+  });
+}
+
+function getAllImages() {
+  return getDB().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(DB_STORE, 'readonly');
+      var store = tx.objectStore(DB_STORE);
+      var result = {};
+      var req = store.openCursor();
+      req.onsuccess = function(e) {
+        var cur = e.target.result;
+        if (cur) { result[cur.key] = cur.value; cur.continue(); }
+        else resolve(result);
+      };
+      req.onerror = function() { reject(req.error); };
+    });
+  }).catch(function() { return {}; });
+}
+
+function clearImages() {
+  return getDB().then(function(db) {
+    return new Promise(function(resolve) {
+      var tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).clear();
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function() { resolve(); };
+    });
+  }).catch(function() {});
+}
+
+// ===== Export / Publish =====
+function buildDeployableJSON() {
+  document.querySelectorAll('[data-key]').forEach(function(el) {
+    var key = el.getAttribute('data-key');
+    setVal(key, el.value);
+  });
+  return JSON.stringify(content, null, 2);
+}
+
+// Prepare content for cloud sync: extract every base64 image into a separate
+// binary file under images/, and replace it inside content.json with its
+// relative path. This keeps content.json tiny and avoids GitHub's 25MB limit.
+function prepareCloudContent(source) {
+  var images = [];
+  function walk(o) {
+    if (typeof o === 'string' && o.indexOf('data:image/') === 0) {
+      var guid = 'img_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+      var ext = 'png';
+      var semi = o.indexOf(';');
+      if (semi > 0) {
+        var mime = o.slice(5, semi).toLowerCase();
+        if (mime === 'image/jpeg' || mime === 'image/jpg') ext = 'jpg';
+        else if (mime === 'image/webp') ext = 'webp';
+        else if (mime === 'image/gif') ext = 'gif';
+        else if (mime === 'image/svg+xml') ext = 'svg';
+        else if (mime === 'image/png') ext = 'png';
+      }
+      var comma = o.indexOf(',');
+      if (comma < 0) return o;
+      var pureBase64 = o.slice(comma + 1);
+      var path = 'images/' + guid + '.' + ext;
+      images.push({path: path, filename: guid + '.' + ext, base64: pureBase64});
+      return path;
+    }
+    if (Array.isArray(o)) { for (var i = 0; i < o.length; i++) o[i] = walk(o[i]); return o; }
+    if (o && typeof o === 'object') { Object.keys(o).forEach(function(k) { o[k] = walk(o[k]); }); return o; }
+    return o;
+  }
+  var clone = JSON.parse(JSON.stringify(source));
+  walk(clone);
+  return {json: JSON.stringify(clone, null, 2), images: images};
+}
+
+function exportJSON() {
+  var json = buildDeployableJSON();
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'content.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('content.json 已下载 / Downloaded');
+}
+
+function publishSite() {
+  document.getElementById('publishOverlay').classList.remove('hidden');
+}
+
+function closePublishOverlay() {
+  document.getElementById('publishOverlay').classList.add('hidden');
+}
+
+function doPublishDownload() {
+  var json = buildDeployableJSON();
+  var hasImage = json.indexOf('data:image/') !== -1;
+  if (!hasImage) {
+    var ok = confirm(
+      '警告：导出的 content.json 里没有检测到任何图片数据。\n\n' +
+      '如果你上传过图片，请先点击「保存」，再重新打开此弹窗下载。\n' +
+      '如果继续下载并部署，线上网站会显示空白或默认占位图。\n\n' +
+      'WARNING: No image data detected in the export.\n' +
+      'Click Save first if you uploaded images, then download again.\n' +
+      'Deploying this file will show blank/default images online.\n\n' +
+      '仍然继续下载？/ Download anyway?'
+    );
+    if (!ok) return;
+  }
+  exportJSON();
+  closePublishOverlay();
+  showToast('请用下载的 content.json 替换项目文件并重新部署 / Replace content.json and redeploy', 'success');
+}
+
+// ===== Open site in new tab =====
+function openSite() {
+  saveContent();
+  window.open('index.html', '_blank');
+}
+
+// ===== Product management (add/remove within categories) =====
+function syncFieldsToContent() {
+  document.querySelectorAll('[data-key]').forEach(function(el) {
+    var key = el.getAttribute('data-key');
+    setVal(key, el.value);
+  });
+}
+
+function switchToPanel(panelId) {
+  document.querySelectorAll('.sidebar-item').forEach(function(i) { i.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  var si = document.querySelector('.sidebar-item[data-panel="' + panelId + '"]');
+  var p = document.getElementById('panel-' + panelId);
+  if (si) si.classList.add('active');
+  if (p) p.classList.add('active');
+  document.getElementById('formArea').scrollTop = 0;
+}
+
+function addProduct(catIndex) {
+  syncFieldsToContent();
+  if (!content.collections.items[catIndex].products) {
+    content.collections.items[catIndex].products = [];
+  }
+  content.collections.items[catIndex].products.push({
+    name: '',
+    desc: '',
+    images: ['', '', '', '']
+  });
+  markDirty();
+  renderPanels();
+  switchToPanel('collections');
+  sendToPreview();
+  showToast('产品已添加 / Product added', 'success');
+}
+
+function removeProduct(catIndex, prodIndex) {
+  if (!confirm('确定删除此产品？/ Delete this product?')) return;
+  syncFieldsToContent();
+  content.collections.items[catIndex].products.splice(prodIndex, 1);
+  markDirty();
+  renderPanels();
+  switchToPanel('collections');
+  sendToPreview();
+  showToast('产品已删除 / Product removed', 'success');
+}
+
+// ===== Reset =====
+async function resetContent() {
+  if (!confirm('确定要重置所有内容到默认值吗？这将丢弃你的修改。\nReset all content to default? This will discard your changes.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  await clearImages();
+  try {
+    var data = await fetch('content.json').then(function(r) { return r.json(); });
+    content = data;
+    renderPanels();
+    markSaved();
+    sendToPreview();
+    showToast('已重置为默认 / Reset to default');
+  } catch(e) {
+    showToast('重置失败 / Reset failed', 'error');
+  }
+}
+
+// ===== Device toggle =====
+function setDevice(device) {
+  document.querySelectorAll('.device-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('.device-btn[data-device="' + device + '"]').classList.add('active');
+  var iframe = document.getElementById('previewFrame');
+  iframe.classList.remove('mobile', 'tablet');
+  if (device === 'mobile') iframe.classList.add('mobile');
+  if (device === 'tablet') iframe.classList.add('tablet');
+}
+
+// ===== Toast =====
+function showToast(msg, type) {
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = type === 'error' ? '#dc3545' : '#28a745';
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 3000);
+}
+
+// ===== Sidebar navigation =====
+document.querySelectorAll('.sidebar-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.sidebar-item').forEach(function(i) { i.classList.remove('active'); });
+    document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+    item.classList.add('active');
+    var panelId = 'panel-' + item.getAttribute('data-panel');
+    var p = document.getElementById(panelId);
+    if (p) p.classList.add('active');
+    // Scroll form area to top
+    document.getElementById('formArea').scrollTop = 0;
+  });
+});
+
+// ===== Keyboard shortcut: Ctrl+S to save =====
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveContent();
+  }
+});
+
+// ===== Warn before leaving with unsaved changes =====
+window.addEventListener('beforeunload', function(e) {
+  if (isDirty) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// ===== Auth =====
+var PASSWORD_HASH = '8f3fb3fa78581c90d910fe36b1b296f6b3929b6ae3d13269f6aa8b0443c97548';
+
+function sha256(str) {
+  var buffer = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', buffer).then(function(hash) {
+    return Array.from(new Uint8Array(hash)).map(function(b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+  });
+}
+
+function doLogin() {
+  var input = document.getElementById('loginPassword').value;
+  var errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if (!input) { errEl.textContent = '请输入密码 / Please enter password'; return; }
+  sha256(input).then(function(hash) {
+    if (hash === PASSWORD_HASH) {
+      sessionStorage.setItem('admin_authed', '1');
+      document.getElementById('loginOverlay').classList.add('hidden');
+    } else {
+      errEl.textContent = '密码错误 / Wrong password';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+    }
+  });
+}
+
+function logout() {
+  sessionStorage.removeItem('admin_authed');
+  location.reload();
+}
+
+// Check auth on load
+(function() {
+  var authed = sessionStorage.getItem('admin_authed');
+  if (authed === '1') {
+    document.getElementById('loginOverlay').classList.add('hidden');
+  }
+})();
+
+// ===== Init =====
+loadContent();
+updateCloudBtnStatus();
+// Send initial content to preview after iframe loads
+document.getElementById('previewFrame').addEventListener('load', function() {
+  setTimeout(function() { sendToPreview(); }, 300);
+});
+</script>
+
+</body>
+</html>
